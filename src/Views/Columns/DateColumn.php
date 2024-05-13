@@ -24,6 +24,15 @@ class DateColumn extends Column
 
     protected string $view = 'livewire-tables::includes.columns.date';
 
+    private ?string $timezone = null;
+
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
     public function getContents(Model $row): null|string|\BackedEnum|HtmlString|DataTableConfigurationException|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
 
@@ -43,6 +52,13 @@ class DateColumn extends Column
                 // Return Null
                 return $this->getEmptyValue();
             }
+        }
+
+        // Apply timezone
+        if (method_exists($dateTime,'setTimezone')
+                && !empty($this->timezone)
+                && in_array($this->timezone, timezone_identifiers_list())) {
+            $dateTime->setTimezone($this->timezone);
         }
 
         // Return
